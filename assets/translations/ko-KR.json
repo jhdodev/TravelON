@@ -1,0 +1,300 @@
+{
+  "app": {
+    "name": "TravelOn"
+  },
+  "login": {
+    "title": "로그인",
+    "email": "이메일",
+    "password": "비밀번호",
+    "save_info": "로그인 정보 저장",
+    "signup": "회원가입",
+    "reset_password": "비밀번호 재설정",
+    "login_button": "로그인",
+    "or": "또는",
+    "sns_login": "SNS 계정으로 로그인",
+    "welcome": "{name}님 환영합니다!",
+    "login_failed": "로그인에 실패했습니다. 다시 시도해주세요.",
+    "google_failed": "Google 로그인에 실패했습니다.",
+    "github_failed": "GitHub 로그인에 실패했습니다.",
+    "kakao_failed": "카카오 로그인에 실패했습니다."
+  },
+  "home": {
+    "next_trip": {
+      "greeting": "{name}님,",
+      "countdown": "{title}까지\nD-{days} 남았습니다!",
+      "today": "즐거운 {title} 되세요!",
+      "no_trips": "예정된 여행이 없습니다"
+    },
+    "weather": {
+      "current": "현재 날씨",
+      "temperature": "{temp}°",
+      "wind_speed": "{speed}m/s",
+      "conditions": {
+        "rain": "비",
+        "rain_snow": "비/눈",
+        "snow": "눈",
+        "shower": "소나기",
+        "clear": "맑음",
+        "cloudy": "구름많음",
+        "overcast": "흐림"
+      }
+    },
+    "popular_courses": "지금 인기있는 여행코스는?",
+    "view_more": "더보기"
+  },
+  "menu": {
+    "travel_recommendation": "여행추천",
+    "guide_ranking": "가이드랭킹",
+    "recommended_places": "추천장소",
+    "travel_gallery": "여행갤러리"
+  },
+  "navigation": {
+    "home": "홈",
+    "packages": "여행상품",
+    "chat": "채팅",
+    "mypage": "마이페이지"
+  },
+  "weather_regions": {
+    "seoul": "서울",
+    "busan": "부산",
+    "daegu": "대구",
+    "incheon": "인천",
+    "gwangju": "광주",
+    "deajeon": "대전",
+    "ulsan": "울산",
+    "jeju": "제주"
+  },
+  "regions": {
+    "seoul": "서울",
+    "incheon_gyeonggi": "인천/경기",
+    "gangwon": "강원",
+    "daejeon_chungnam": "대전/충남",
+    "chungbuk": "충북",
+    "gwangju_jeonnam": "광주/전남",
+    "jeonbuk": "전북",
+    "busan_gyeongnam": "부산/경남",
+    "daegu_gyeongbuk": "대구/경북",
+    "Ulsan": "울산",
+    "jeju": "제주도",
+    "all": "전체"
+  },
+  "common": {
+    "guest": "게스트",
+    "see_more": "더보기",
+    "confirm": "확인",
+    "cancel": "취소",
+    "save": "저장",
+    "delete": "삭제",
+    "edit": "수정",
+    "back": "뒤로",
+    "close": "닫기",
+    "loading": "로딩중...",
+    "error": "오류가 발생했습니다",
+    "retry": "다시 시도",
+    "success": "성공",
+    "failed": "실패",
+    "notice": "알림"
+  },
+  "search": {
+    "title": "여행 패키지",
+    "hint": "패키지 제목이나 설명으로 검색...",
+    "result_count": "검색 결과: {count}개",
+    "selected_region": "선택된 지역: {region}",
+    "region": "지역: {region}"
+  },
+  "sort": {
+    "latest": "최신순",
+    "price_high": "가격 높은순",
+    "price_low": "가격 낮은순",
+    "popular": "인기순",
+    "high_rating": "별점 높은순",
+    "most_reviews": "리뷰 많은순"
+  },
+  "package_detail": {
+    "title": "패키지 상세",
+    "guide": "가이드: {name}",
+    "participants": "예약 가능 인원: {min}명 ~ {max}명",
+    "participants_unknown": "예약 가능 인원: 정보 없음",
+    "price": "1인 {price}원",
+    "booking_closed": "오늘은 예약이 마감되었습니다",
+    "description": "상세 설명",
+    "course": "여행 코스",
+    "no_course": "등록된 여행 코스가 없습니다",
+    "view_route": "상세 경로 보기",
+    "images": "상세 이미지",
+    "location_info": {
+      "details": "상세 정보",
+      "view_map": "지도에서 보기",
+      "map_error": "지도를 열 수 없습니다"
+    },
+    "booking": {
+      "book_now": "예약하기",
+      "closed": "오늘은 예약 마감"
+    }
+  },
+  "profile": {
+    "title": "마이페이지",
+    "default_user": "사용자",
+    "guide": {
+      "section_title": "가이드 기능",
+      "create_package": "나만의 패키지 만들기",
+      "create_package_desc": "새로운 여행 패키지를 등록합니다",
+      "manage_reservations": "내 패키지 예약 관리",
+      "manage_reservations_desc": "등록한 패키지의 예약을 관리합니다",
+      "manage_packages": "내 패키지 관리",
+      "manage_packages_desc": "등록한 패키지를 수정하거나 삭제합니다",
+      "certification": "가이드 인증",
+      "certification_desc": "가이드 인증을 진행하세요"
+    },
+    "user": {
+      "reservations_title": "예약 관리",
+      "my_reservations": "내 예약 내역",
+      "my_reservations_desc": "예약한 패키지를 확인합니다",
+      "liked_packages": "찜한 패키지",
+      "liked_packages_desc": "관심있는 패키지를 확인합니다"
+    },
+    "logout": "로그아웃",
+    "logout_failed": "로그아웃 실패: {error}"
+  },
+  "package_form": {
+    "title": "새 패키지 등록",
+    "main_image": {
+      "add": "메인 이미지 추가"
+    },
+    "package_title": {
+      "label": "패키지 제목",
+      "hint": "예: 서울 시티 투어",
+      "error": "제목을 입력해주세요"
+    },
+    "region": {
+      "label": "지역"
+    },
+    "price": {
+      "label": "가격",
+      "hint": "예: 50000",
+      "error": {
+        "empty": "가격을 입력해주세요",
+        "invalid": "유효한 숫자를 입력해주세요"
+      }
+    },
+    "nights": {
+      "label": "박 수",
+      "format": "{nights}박{days}일"
+    },
+    "departure_days": {
+      "label": "출발 요일",
+      "error": "출발 요일을 선택해주세요",
+      "days": {
+        "mon": "월",
+        "tue": "화",
+        "wed": "수",
+        "thu": "목",
+        "fri": "금",
+        "sat": "토",
+        "sun": "일"
+      }
+    },
+    "participants": {
+      "min": {
+        "label": "최소 인원",
+        "hint": "예: 2",
+        "error": {
+          "empty": "최소 인원을 입력해주세요",
+          "invalid": "유효한 인원 수를 입력해주세요",
+          "greater_than_max": "최소 인원이 최대 인원보다 클 수 없습니다"
+        }
+      },
+      "max": {
+        "label": "최대 인원",
+        "hint": "예: 10",
+        "error": {
+          "empty": "최대 인원을 입력해주세요",
+          "invalid": "유효한 인원 수를 입력해주세요"
+        }
+      }
+    },
+    "description": {
+      "label": "패키지 설명",
+      "hint": "패키지에 대한 상세 설명을 입력해주세요",
+      "error": "설명을 입력해주세요",
+      "images": {
+        "label": "설명 이미지",
+        "add": "추가"
+      }
+    },
+    "route": {
+      "label": "여행 코스"
+    },
+    "submit": "패키지 등록",
+    "places": {
+      "hotel": "숙소",
+      "restaurant": "식당",
+      "attraction": "관광지"
+    },
+    "route_editor": {
+      "day": "{day}일차"
+    },
+    "travel_route": {
+      "title": "여행 코스"
+    }
+  },
+  "reservations": {
+    "my_reservations": "내 예약 내역",
+    "pending_reservations": "대기중인 예약",
+    "confirmed_reservations": "확정된 예약",
+    "no_reservations": "예약 내역이 없습니다.",
+    "no_pending_reservations": "대기중인 예약이 없습니다.",
+    "no_confirmed_reservations": "확정된 예약이 없습니다.",
+    "guide": "가이드: {0}",
+    "reservation_date": "예약일: {0}",
+    "request_date": "신청일: {0}",
+    "price": "가격: ￦{0}",
+    "pending_approval": "승인 대기중",
+    "confirmed": "예약 확정",
+    "package_not_found": "패키지를 찾을 수 없 습니다.",
+    "package_load_error": "패키지 정보를 불러올 수 없습니다: {0}"
+  },
+  "guide_ranking": {
+    "title": "가이드 랭킹",
+    "stats": "총 {0}건의 예약 / {1}개의 패키지",
+    "rank": "{0}위",
+    "error": "에러: {0}"
+  },
+  "review": {
+    "count": "리뷰 {count}개",
+    "write": "리뷰 작성",
+    "edit": "리뷰 수정",
+    "package_title": "패키지명",
+    "rating": "별점",
+    "content": {
+      "label": "리뷰 내용",
+      "hint": "패키지 여행에 대한 경험을 공유해주세요",
+      "empty_error": "리뷰 내용을 입력해주세요"
+    },
+    "submit": "리뷰 등록",
+    "update": "수정 완료",
+    "success": {
+      "add": "리뷰가 등록되었습니다",
+      "edit": "리뷰가 수정되었습니다"
+    },
+    "stats": {
+      "count": "리뷰 {count}개",
+      "empty": "아직 작성된 리뷰가 없습니다"
+    },
+    "action": {
+      "write": "리뷰 작성하기",
+      "cannot_write": "리뷰 작성 불가",
+      "load_more": "더보기"
+    },
+    "error": {
+      "unauthorized": "예약 승인된 사용자만 리뷰를 작성할 수 있습니다",
+      "already_reviewed": "이미 리뷰를 작성하셨습니다",
+      "check_status": "리뷰 상태 확인 중 오류가 발생했습니다",
+      "loading": "리뷰 로딩 중 오류가 발생했습니다"
+    }
+  },
+  "recommendation": {
+    "title": "맞춤 여행 추천",
+    "empty": "추천할 여행 패키지가 없습니다.\n여행 패키지를 좋아요하고 더 많은 추천을 받아보세요!"
+  }
+}

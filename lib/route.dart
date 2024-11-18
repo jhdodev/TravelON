@@ -12,11 +12,17 @@ import 'package:travel_on_final/core/presentation/widgets/scaffold_with_bottom_n
 // chat
 import 'package:travel_on_final/features/chat/presentation/screens/chat_list_screen.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/chat_screen.dart';
-import 'package:travel_on_final/features/guide/presentation/screens/guide_packages_screen.dart';
-import 'package:travel_on_final/features/guide/presentation/screens/guide_ranking_screen.dart';
+
+// chat // search
 import 'package:travel_on_final/features/chat/presentation/screens/search/guide_search_screen.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/search/user_search_screen.dart';
 import 'package:travel_on_final/features/chat/presentation/screens/search/package_search_screen.dart';
+import 'package:travel_on_final/features/chat/presentation/screens/search/map_search_screen.dart';
+
+// guide
+import 'package:travel_on_final/features/guide/presentation/screens/guide_packages_screen.dart';
+import 'package:travel_on_final/features/guide/presentation/screens/guide_ranking_screen.dart';
+import 'package:travel_on_final/features/recommendation/presentation/screens/recommendation_screen.dart';
 // reservation
 import 'package:travel_on_final/features/reservation/presentation/screens/reservation_calendar_screen.dart';
 // search
@@ -25,10 +31,11 @@ import 'package:travel_on_final/features/search/presentation/providers/travel_pr
 import 'package:travel_on_final/features/search/presentation/screens/add_package_screen.dart';
 import 'package:travel_on_final/features/search/presentation/screens/detail_screens.dart';
 import 'package:travel_on_final/features/search/presentation/screens/package_detail_screen.dart';
+import 'package:travel_on_final/features/map/presentation/screens/map_detail_screen.dart';
 // home
 import 'package:travel_on_final/features/home/presentation/screens/home_screen.dart';
 // profile
-import 'package:travel_on_final/features/profile/presentation/screens/profile_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/my_profile_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/edit_packages_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/guide_certification_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/guide_reservation_screen.dart';
@@ -36,6 +43,10 @@ import 'package:travel_on_final/features/profile/presentation/screens/liked_pack
 import 'package:travel_on_final/features/profile/presentation/screens/my_packages_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/reservation_screen.dart';
 import 'package:travel_on_final/features/profile/presentation/screens/profile_edit_screen.dart';
+// profile // user
+import 'package:travel_on_final/features/profile/presentation/screens/user/user_profile_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/user/user_package_screen.dart';
+import 'package:travel_on_final/features/profile/presentation/screens/user/user_review_screen.dart';
 // gallery
 import 'package:travel_on_final/features/gallery/presentation/screens/travel_gallery_screen.dart';
 import 'package:travel_on_final/features/gallery/presentation/screens/add_gallery_post_screen.dart';
@@ -44,6 +55,7 @@ import 'package:travel_on_final/features/gallery/presentation/screens/edit_galle
 import 'package:travel_on_final/features/gallery/presentation/screens/gallery_search_screen.dart';
 // review
 import 'package:travel_on_final/features/review/presentation/screens/add_review_screen.dart';
+import 'features/regional/presentation/screens/regional_exploration_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -62,7 +74,10 @@ final goRouter = GoRouter(
       path: '/package-detail/:id',
       builder: (context, state) {
         final package = state.extra as TravelPackage;
-        return PackageDetailScreen(package: package, totalDays: 1,);
+        return PackageDetailScreen(
+          package: package,
+          totalDays: 1,
+        );
       },
     ),
     GoRoute(
@@ -157,7 +172,7 @@ final goRouter = GoRouter(
         final chatId = extra?['chatId'] as String?;
         final otherUserId = extra?['otherUserId'] as String?;
         if (chatId == null || otherUserId == null) {
-          return Scaffold(
+          return const Scaffold(
             body: Center(
               child: Text('필요한 정보가 없습니다.'),
             ),
@@ -171,19 +186,75 @@ final goRouter = GoRouter(
       builder: (context, state) {
         final extraData = state.extra as Map<String, dynamic>?;
 
-        if (extraData != null && extraData.containsKey('chatId') && extraData.containsKey('otherUserId')) {
+        if (extraData != null &&
+            extraData.containsKey('chatId') &&
+            extraData.containsKey('otherUserId')) {
           return PackageSearchScreen(
             chatId: extraData['chatId'],
             otherUserId: extraData['otherUserId'],
           );
         } else {
-          return HomeScreen();
+          return const Scaffold(
+            body: Center(
+              child: Text('필요한 정보가 없습니다.'),
+            ),
+          );
         }
+      },
+    ),
+    GoRoute(
+      path: '/map-search',
+      builder: (context, state) {
+        final extraData = state.extra as Map<String, dynamic>?;
+        if (extraData != null &&
+            extraData.containsKey('chatId') &&
+            extraData.containsKey('otherUserId')) {
+          return MapSearchScreen(
+            chatId: extraData['chatId'],
+            otherUserId: extraData['otherUserId'],
+          );
+        } else {
+          return const Scaffold(
+            body: Center(
+              child: Text('필요한 정보가 없습니다.'),
+            ),
+          );
+        }
+      },
+    ),
+    GoRoute(
+      path: '/map-detail/:latitude/:longitude',
+      builder: (context, state) {
+        final latitude = double.parse(state.pathParameters['latitude']!);
+        final longitude = double.parse(state.pathParameters['longitude']!);
+        return MapDetailScreen(latitude: latitude, longitude: longitude);
+      },
+    ),
+    // profile 관련 코드
+    GoRoute(
+      path: '/user-profile/:userId',
+      builder: (context, state) {
+        final userId = state.pathParameters['userId']!;
+        return UserProfileScreen(userId: userId);
       },
     ),
     GoRoute(
       path: '/profile/edit',
       builder: (context, state) => ProfileEditScreen(),
+    ),
+    GoRoute(
+      path: '/user-packages/:userId',
+      builder: (context, state) {
+        final userId = state.pathParameters['userId']!;
+        return UserPackageScreen(userId: userId);
+      },
+    ),
+    GoRoute(
+      path: '/user-reviews/:userId',
+      builder: (context, state) {
+        final userId = state.pathParameters['userId']!;
+        return UserReviewScreen(userId: userId);
+      },
     ),
     ////////////////////////////////////////////////////////////////////////////////////
     //                ↓↓↓ 바텀 내비게이션 바가 필요한 화면 라우팅 ↓↓↓                    //
@@ -249,13 +320,25 @@ final goRouter = GoRouter(
             ),
           );
         }
-        return PackageDetailScreen(package: package, totalDays: 1,);
+        return PackageDetailScreen(
+          package: package,
+          totalDays: 1,
+        );
       },
     ),
     // 기존 라우트 목록에 추가
     GoRoute(
       path: '/gallery-search',
       builder: (context, state) => const GallerySearchScreen(),
+    ),
+    // 추천 화면 라우트 추가
+    GoRoute(
+      path: '/recommendation',
+      builder: (context, state) => const RecommendationScreen(),
+    ),
+    GoRoute(
+      path: '/regional-exploration',
+      builder: (context, state) => const RegionalExplorationScreen(),
     ),
   ],
 );

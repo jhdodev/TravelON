@@ -1,8 +1,8 @@
-// lib/features/home/presentation/screens/home_screen.dart
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/home/presentation/providers/home_provider.dart';
 import 'package:travel_on_final/features/home/presentation/widgets/next_trip_card.dart';
@@ -14,6 +14,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/providers/navigation_provider.dart';
 import '../../../../features/notification/presentation/screens/notification_center_screen.dart';
 import '../../../../features/notification/presentation/providers/notification_provider.dart';
+import '../../../../features/home/presentation/widgets/tourism_density_widget.dart';
+import 'package:travel_on_final/features/recommendation/presentation/screens/recommendation_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,7 +28,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // build가 완료된 후 데이터 로드
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadData();
     });
@@ -42,7 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
           .loadNextTrip(authProvider.currentUser!.id);
     }
 
-    // 패키지 데이터 로드
     await travelProvider.loadPackages();
   }
 
@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'TravelOn',
+          'app.name'.tr(),
           style: TextStyle(
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
@@ -114,40 +114,47 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // D-Day 카운터
               const NextTripCard(),
               SizedBox(height: 20.h),
-
-              // 날씨 정보
               const WeatherSlider(),
-              SizedBox(height: 30.h),
-
-              // 메뉴 그리드
+              SizedBox(height: 10.h),
               GridView.count(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisCount: 4,
-                mainAxisSpacing: 20.w,
-                crossAxisSpacing: 20.w,
+                mainAxisSpacing: 15.w,
+                crossAxisSpacing: 15.w,
+                childAspectRatio: 0.9,
                 children: [
-                  _buildMenuItem(Icons.star, '여행꿀팁'),
-                  _buildMenuItem(Icons.people, '가이드랭킹'),
-                  _buildMenuItem(Icons.favorite_border, '추천장소'),
-                  _buildMenuItem(Icons.photo_camera, '여행갤러리'),
-                  // _buildMenuItem(Icons.restaurant, '트슐랭가이드'),
-                  // _buildMenuItem(Icons.location_on, '전국지도'),
-                  // _buildMenuItem(Icons.calendar_today, '일정만들기'),
-                  // _buildMenuItem(Icons.wb_sunny, '생생날씨'),
+                  _buildMenuItem(
+                    CupertinoIcons.heart_fill,
+                    '여행추천',
+                    '/recommendation',
+                  ),
+                  _buildMenuItem(
+                    CupertinoIcons.person_3_fill,
+                    '가이드랭킹',
+                    '/guide-ranking',
+                  ),
+                  _buildMenuItem(
+                    CupertinoIcons.map_pin_ellipse,
+                    '지역탐방',
+                    '/regional-exploration',
+                  ),
+                  _buildMenuItem(
+                    CupertinoIcons.camera_fill,
+                    '여행갤러리',
+                    '/travel-gallery',
+                  ),
                 ],
               ),
-              SizedBox(height: 30.h),
-
-              // 하단 추천 섹션
+              // SizedBox(height: 10.h),
+              const TourismDensityWidget(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '지금 인기있는 여행코스는?',
+                    'home.popular_courses'.tr(),
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
@@ -155,14 +162,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   TextButton(
                     onPressed: () {
-                      // 하단 네비게이션 바의 여행 상품 탭(인덱스 1)으로 이동
                       context.read<NavigationProvider>().setIndex(1);
                     },
                     child: Row(
                       children: [
-                        const Text(
-                          '더보기',
-                          style: TextStyle(color: Colors.blueAccent),
+                        Text(
+                          'common.see_more'.tr(), // 여기를 확인
+                          style: const TextStyle(color: Colors.blueAccent),
                         ),
                         Icon(Icons.chevron_right, color: Colors.grey.shade600),
                       ],
@@ -171,8 +177,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               SizedBox(height: 10.h),
-
-              // 가로 스크롤 되는 추천 이미지 카드
               Consumer<TravelProvider>(
                 builder: (context, provider, child) {
                   final popularPackages = provider.getPopularPackages();
@@ -216,64 +220,42 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String label) {
+  Widget _buildMenuItem(IconData icon, String label, String route) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
         GestureDetector(
           onTap: () {
-            if (label == '여행갤러리') {
-              context.push('/travel-gallery');
-            } else if (label == '가이드랭킹') {
-              context.push('/guide-ranking');
+            if (route.isNotEmpty) {
+              context.push(route);
             }
           },
           child: Container(
-            padding: EdgeInsets.all(12.r),
+            padding: EdgeInsets.all(10.r),
             decoration: BoxDecoration(
               color: Colors.grey.shade100,
               borderRadius: BorderRadius.circular(12.r),
             ),
-            child: Icon(icon, color: Colors.blue),
+            child: Icon(icon, color: Colors.blue, size: 20.r),
           ),
         ),
-        SizedBox(height: 3.h),
+        SizedBox(height: 4.h),
         Text(
           label,
           style: TextStyle(
-            fontSize: 12.sp,
+            fontSize: 11.sp,
             color: Colors.grey.shade800,
           ),
           textAlign: TextAlign.center,
+          maxLines: 2, // 1에서 2로 변경
+          softWrap: true, // 자동 줄바꿈 활성화
         ),
       ],
     );
   }
 
   String _getRegionText(String region) {
-    switch (region) {
-      case 'seoul':
-        return '서울';
-      case 'incheon_gyeonggi':
-        return '인천/경기';
-      case 'gangwon':
-        return '강원';
-      case 'daejeon_chungnam':
-        return '대전/충남';
-      case 'chungbuk':
-        return '충북';
-      case 'gwangju_jeonnam':
-        return '광주/전남';
-      case 'jeonbuk':
-        return '전북';
-      case 'busan_gyeongnam':
-        return '부산/경남';
-      case 'daegu_gyeongbuk':
-        return '대구/경북';
-      case 'jeju':
-        return '제주도';
-      default:
-        return '전체';
-    }
+    return 'regions.$region'.tr();
   }
 }

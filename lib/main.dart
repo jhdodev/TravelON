@@ -1,10 +1,11 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
 // Firebase
 import 'package:firebase_core/firebase_core.dart';
@@ -28,6 +29,8 @@ import 'package:travel_on_final/features/reservation/presentation/providers/rese
 import 'package:travel_on_final/features/review/presentation/provider/review_provider.dart';
 import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 import 'package:travel_on_final/features/gallery/presentation/providers/gallery_provider.dart';
+import 'package:travel_on_final/features/recommendation/presentation/providers/recommendation_provider.dart';
+import 'package:travel_on_final/features/regional/presentation/providers/regional_provider.dart';
 
 // Repositories & UseCases
 import 'package:travel_on_final/features/auth/data/repositories/auth_repository_impl.dart';
@@ -38,12 +41,19 @@ import 'package:travel_on_final/features/home/domain/usecases/get_next_trip.dart
 import 'package:travel_on_final/features/review/data/repositories/review_repository_impl.dart';
 import 'package:travel_on_final/features/search/data/repositories/travel_repositories_impl.dart';
 import 'package:travel_on_final/features/gallery/data/repositories/gallery_repository.dart';
+import 'package:travel_on_final/features/regional/data/repositories/regional_repository_impl.dart';
 
 // Router
 import 'package:travel_on_final/route.dart';
 
+import 'package:kakao_flutter_sdk_common/kakao_flutter_sdk_common.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isAndroid) {
+    debugPrint('Using Skia rendering');
+  }
+  await EasyLocalization.ensureInitialized();
 
   await dotenv.load(fileName: ".env");
 
@@ -56,6 +66,12 @@ Future<void> main() async {
   // Firebase 초기화
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // 카카오 SDK 초기화
+  KakaoSdk.init(
+    nativeAppKey: dotenv.env['KAKAO_NATIVE_APP_KEY'] ?? '',
+    javaScriptAppKey: dotenv.env['KAKAO_JAVASCRIPT_KEY'] ?? '',
   );
 
   // FCM 초기화 및 권한 설정
@@ -79,7 +95,94 @@ Future<void> main() async {
   // Shared Preferences 초기화
   await SharedPreferences.getInstance();
 
-  runApp(const MyApp());
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [
+        Locale('ko', 'KR'),
+        Locale('en', 'US'),
+        Locale('ja', 'JP'),
+        Locale('zh', 'CN'),
+      ],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('ko', 'KR'),
+      child: MultiProvider(
+        providers: [
+          // Firebase 서비스 프로바이더
+          Provider<FirebaseAuth>.value(value: FirebaseAuth.instance),
+          Provider<FirebaseFirestore>.value(value: FirebaseFirestore.instance),
+          Provider<FirebaseMessaging>.value(value: FirebaseMessaging.instance),
+
+          // Repositories
+          Provider<AuthRepository>(create: (_) => AuthRepositoryImpl()),
+          Provider<GalleryRepository>(create: (_) => GalleryRepository()),
+
+          // Core Providers
+          ChangeNotifierProvider(create: (_) => NavigationProvider()),
+          ChangeNotifierProvider(create: (_) => WeatherProvider()),
+
+          // Auth 및 Travel 관련 Providers
+          ProxyProvider<FirebaseAuth, ResetPasswordUseCase>(
+            update: (_, auth, __) => ResetPasswordUseCase(auth),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => TravelProvider(
+              TravelRepositoryImpl(),
+              auth: FirebaseAuth.instance,
+            ),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => app.AuthProvider(
+              context.read<FirebaseAuth>(),
+              context.read<ResetPasswordUseCase>(),
+              context.read<TravelProvider>(),
+            ),
+          ),
+
+          // Feature Providers
+          ChangeNotifierProvider(
+            create: (context) =>
+                ChatProvider(context.read<NavigationProvider>()),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => ReservationProvider(FirebaseFirestore.instance),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => ReviewProvider(
+              ReviewRepositoryImpl(context.read<TravelProvider>()),
+            ),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => HomeProvider(
+              GetNextTrip(HomeRepositoryImpl(FirebaseFirestore.instance)),
+            ),
+          ),
+          ChangeNotifierProvider(
+            create: (context) =>
+                GalleryProvider(context.read<GalleryRepository>()),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => GuideRankingProvider(FirebaseFirestore.instance),
+          ),
+          ChangeNotifierProvider(
+            create: (context) => NotificationProvider(
+              FirebaseFirestore.instance,
+              FirebaseMessaging.instance,
+              context.read<NavigationProvider>(), // NavigationProvider 주입
+            ),
+          ),
+          ChangeNotifierProvider(create: (_) => RecommendationProvider()),
+          ChangeNotifierProvider(
+            create: (context) => RegionalProvider(
+              RegionalRepositoryImpl(
+                client: http.Client(),
+              ),
+            ),
+          ),
+        ],
+        child: const MyApp(),
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -87,81 +190,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        // Firebase 서비스 프로바이더
-        Provider<FirebaseAuth>.value(value: FirebaseAuth.instance),
-        Provider<FirebaseFirestore>.value(value: FirebaseFirestore.instance),
-        Provider<FirebaseMessaging>.value(value: FirebaseMessaging.instance),
-
-        // Repositories
-        Provider<AuthRepository>(create: (_) => AuthRepositoryImpl()),
-        Provider<GalleryRepository>(create: (_) => GalleryRepository()),
-
-        // Core Providers
-        ChangeNotifierProvider(create: (_) => NavigationProvider()),
-        ChangeNotifierProvider(create: (_) => WeatherProvider()),
-
-        // Auth 및 Travel 관련 Providers
-        ProxyProvider<FirebaseAuth, ResetPasswordUseCase>(
-          update: (_, auth, __) => ResetPasswordUseCase(auth),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => TravelProvider(
-            TravelRepositoryImpl(),
-            auth: FirebaseAuth.instance,
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => app.AuthProvider(
-            context.read<FirebaseAuth>(),
-            context.read<ResetPasswordUseCase>(),
-            context.read<TravelProvider>(),
-          ),
-        ),
-
-        // Feature Providers
-        ChangeNotifierProvider(
-          create: (context) => ChatProvider(context.read<NavigationProvider>()),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => ReservationProvider(FirebaseFirestore.instance),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => ReviewProvider(
-            ReviewRepositoryImpl(context.read<TravelProvider>()),
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => HomeProvider(
-            GetNextTrip(HomeRepositoryImpl(FirebaseFirestore.instance)),
-          ),
-        ),
-        ChangeNotifierProvider(
-          create: (context) =>
-              GalleryProvider(context.read<GalleryRepository>()),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => GuideRankingProvider(FirebaseFirestore.instance),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => NotificationProvider(
-            FirebaseFirestore.instance,
-            context.read<FirebaseMessaging>(),
-          ),
-        ),
-      ],
-      child: ScreenUtilInit(
-        designSize: const Size(375, 812),
-        child: MaterialApp.router(
-          title: 'Travel On',
-          debugShowCheckedModeBanner: false,
-          routerConfig: goRouter,
-          theme: ThemeData(
-            primaryColor: Colors.blue,
-            colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
-                .copyWith(secondary: Colors.blueAccent),
-          ),
+    return ScreenUtilInit(
+      designSize: const Size(375, 812),
+      child: MaterialApp.router(
+        title: 'Travel On',
+        debugShowCheckedModeBanner: false,
+        routerConfig: goRouter,
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale,
+        theme: ThemeData(
+          primaryColor: Colors.blue,
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
+              .copyWith(secondary: Colors.blueAccent),
         ),
       ),
     );
