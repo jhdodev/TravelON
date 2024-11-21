@@ -2,6 +2,8 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:provider/provider.dart';
+import 'package:travel_on_final/core/providers/theme_provider.dart';
 import 'package:travel_on_final/features/chat/domain/entities/message_entity.dart';
 import 'package:travel_on_final/features/chat/domain/usecases/create_chat_id.dart';
 import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
@@ -108,7 +110,8 @@ class MessageBubble extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(top: 0.h, right: 10.w, left: 10.w),
               child: Text(
-                DateFormat('MM월 dd일 a hh:mm', 'ko').format(message.createdAt.toDate()),
+                DateFormat('MM월 dd일 a hh:mm', 'ko')
+                    .format(message.createdAt.toDate()),
                 style: TextStyle(
                   color: Colors.grey[600],
                   fontSize: 12.sp,
@@ -121,7 +124,7 @@ class MessageBubble extends StatelessWidget {
   }
 
   Widget _buildLocationDetails(
-    BuildContext context, Map<String, dynamic> location) {
+      BuildContext context, Map<String, dynamic> location) {
     final latitude = location['latitude'] ?? 0.0;
     final longitude = location['longitude'] ?? 0.0;
     final name = location['title'] ?? '위치 정보';
@@ -183,6 +186,7 @@ class MessageBubble extends StatelessWidget {
 
   Widget _buildPackageDetails(
       BuildContext context, Map<String, dynamic> package) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     final formattedPrice =
         NumberFormat('#,###').format(package['price'].toInt());
     return Column(
@@ -208,7 +212,10 @@ class MessageBubble extends StatelessWidget {
         SizedBox(height: 8.h),
         Text(
           package['title'] ?? '패키지 이름 없음',
-          style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 20.sp,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.grey[800] : Colors.black),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.center,
@@ -259,7 +266,9 @@ class MessageBubble extends StatelessWidget {
           package['description'] ?? '설명 없음',
           maxLines: 4,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(fontSize: 14.sp),
+          style: TextStyle(
+              fontSize: 14.sp,
+              color: isDarkMode ? Colors.grey[800] : Colors.black),
         ),
         SizedBox(height: 16.h),
         Center(
