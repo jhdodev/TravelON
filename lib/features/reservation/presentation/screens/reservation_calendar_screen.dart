@@ -252,7 +252,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
         participants: _selectedParticipants,
       );
 
-      // Toss Payments 결제 화면으로 이동
+      // Toss Payments 결제 화면으로 이동 
       PaymentData paymentData = PaymentData(
         paymentMethod: '카드',
         orderId: 'tosspaymentsFlutter_${DateTime.now().millisecondsSinceEpoch}',
@@ -522,7 +522,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
                         Text(
                           'reservation_calendar.price'.tr(namedArgs: {
                             'price': NumberFormat('#,###')
-                                .format(widget.package.price.toInt())
+                                .format((widget.package.price * _selectedParticipants).toInt())
                           }),
                           style: TextStyle(fontSize: 16.sp),
                         ),
