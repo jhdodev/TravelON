@@ -204,6 +204,44 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(
             seedColor: AppColors.travelonLightBlueColor,
             brightness: Brightness.light,
+            background: Colors.white,
+            surface: Colors.white,
+            primary: AppColors.travelonLightBlueColor,
+            secondary: Colors.blueAccent,
+            onSurface: Colors.black87,
+            onPrimary: Colors.white,
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ButtonStyle(
+              backgroundColor:
+                  WidgetStateProperty.all(AppColors.travelonLightBlueColor),
+              foregroundColor: WidgetStateProperty.all(Colors.white),
+              textStyle: WidgetStateProperty.all(
+                const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  inherit: true,
+                ),
+              ),
+              padding: WidgetStateProperty.all(
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
+          ),
+          cardTheme: const CardTheme(
+            elevation: 2,
+            margin: EdgeInsets.symmetric(vertical: 4),
+            color: Colors.white,
+          ),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            elevation: 0,
+            iconTheme: IconThemeData(color: Colors.black),
+          ),
+          bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+            backgroundColor: Colors.white,
+            selectedItemColor: AppColors.travelonLightBlueColor,
+            unselectedItemColor: Colors.grey,
           ),
         ),
         darkTheme: ThemeData(
@@ -211,6 +249,63 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(
             seedColor: AppColors.travelonBlueColor,
             brightness: Brightness.dark,
+            background: const Color(0xFF1A1A1A),
+            surface: const Color(0xFF2C2C2C),
+            primary: AppColors.travelonBlueColor,
+            secondary: Colors.blueAccent,
+            onSurface: Colors.white,
+            onPrimary: Colors.white,
+            onBackground: Colors.white,
+          ),
+          scaffoldBackgroundColor: const Color(0xFF1A1A1A),
+          cardTheme: CardTheme(
+            elevation: 2,
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            color: const Color(0xFF2C2C2C),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color(0xFF1A1A1A),
+            foregroundColor: Colors.white,
+            elevation: 0,
+            iconTheme: IconThemeData(color: Colors.white70),
+          ),
+          iconTheme: const IconThemeData(
+            color: Colors.white70,
+          ),
+          textTheme: const TextTheme(
+            bodyLarge: TextStyle(color: Colors.white),
+            bodyMedium: TextStyle(color: Colors.white70),
+            titleLarge: TextStyle(color: Colors.white),
+            titleMedium: TextStyle(color: Colors.white),
+            titleSmall: TextStyle(color: Colors.white70),
+          ),
+          dividerTheme: const DividerThemeData(
+            color: Colors.white24,
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ButtonStyle(
+              backgroundColor:
+                  WidgetStateProperty.all(AppColors.travelonBlueColor),
+              foregroundColor: WidgetStateProperty.all(Colors.white),
+              textStyle: WidgetStateProperty.all(
+                const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  inherit: true,
+                ),
+              ),
+              padding: WidgetStateProperty.all(
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
+          ),
+          bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+            backgroundColor: Color(0xFF1A1A1A),
+            selectedItemColor: AppColors.travelonBlueColor,
+            unselectedItemColor: Colors.grey,
+            elevation: 0,
           ),
         ),
         themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
