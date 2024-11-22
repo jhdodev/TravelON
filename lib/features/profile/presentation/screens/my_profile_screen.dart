@@ -242,7 +242,7 @@ class ProfileScreen extends StatelessWidget {
                           }
                         },
                         child: Text('profile.logout'.tr(),
-                            style: TextStyle(color: Colors.redAccent)),
+                            style: const TextStyle(color: Colors.redAccent)),
                       ),
                     ),
                   ),
