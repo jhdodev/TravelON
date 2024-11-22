@@ -248,7 +248,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
         guideName: widget.package.guideName,
         guideId: widget.package.guideId,
         reservationDate: _selectedDay!,
-        price: widget.package.price,
+        price: (widget.package.price * _selectedParticipants),
         participants: _selectedParticipants,
       );
 
@@ -257,7 +257,7 @@ class _ReservationCalendarScreenState extends State<ReservationCalendarScreen> {
         paymentMethod: '카드',
         orderId: 'tosspaymentsFlutter_${DateTime.now().millisecondsSinceEpoch}',
         orderName: widget.package.title,
-        amount: widget.package.price.toInt(),
+        amount: (widget.package.price * _selectedParticipants).toInt(),
         customerName: authProvider.currentUser!.name,
         customerEmail: authProvider.currentUser!.id,
       );
