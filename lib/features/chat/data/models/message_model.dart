@@ -10,6 +10,7 @@ class MessageModel {
   String? imageUrl;
   Map<String, dynamic>? sharedUser;
   Map<String, dynamic>? sharedPackage;
+  Map<String, dynamic>? location;
 
   MessageModel({
     required this.id,
@@ -20,6 +21,7 @@ class MessageModel {
     this.imageUrl,
     this.sharedUser,
     this.sharedPackage,
+    this.location,
   });
 
   factory MessageModel.fromDocument(DocumentSnapshot doc) {
@@ -34,11 +36,13 @@ class MessageModel {
       imageUrl: data?['imageUrl'],
       sharedUser: data?['sharedUser'],
       sharedPackage: data?['sharedPackage'],
+      location: data?['location'],
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'text': text,
       'uId': uId,
       'createdAt': createdAt,
@@ -46,11 +50,13 @@ class MessageModel {
       'imageUrl': imageUrl,
       if (sharedUser != null) 'sharedUser': sharedUser,
       if (sharedPackage != null) 'sharedPackage': sharedPackage,
+      if (location != null) 'location': location,
     };
   }
 
   MessageEntity toEntity() {
     return MessageEntity(
+      id: id,
       text: text,
       uId: uId,
       createdAt: createdAt,
@@ -58,6 +64,7 @@ class MessageModel {
       imageUrl: imageUrl,
       sharedUser: sharedUser,
       sharedPackage: sharedPackage,
+      location: location,
     );
   }
 }

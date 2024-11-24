@@ -1,6 +1,8 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:travel_on_final/features/auth/data/models/user_model.dart';
 import '../../domain/repositories/travel_repositories.dart';
 import '../../domain/entities/travel_package.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,6 +29,7 @@ class TravelProvider extends ChangeNotifier {
   String? _error;
   SortOption _currentSort = SortOption.latest;
   SortOption get currentSort => _currentSort;
+  final FirebaseStorage _storage = FirebaseStorage.instance; // 추가
 
   TravelProvider(this._repository, {required FirebaseAuth auth})
       : _auth = auth {
@@ -184,18 +187,67 @@ class TravelProvider extends ChangeNotifier {
   // 패키지 추가
   Future<void> addPackage(TravelPackage package) async {
     try {
-      _isLoading = true;
-      notifyListeners();
+      // 1. 먼저 이미지들을 Firebase Storage에 업로드
+      String? mainImageUrl;
+      List<String> descriptionImageUrls = [];
 
-      await _repository.addPackage(package);
-      await loadPackages();
+      // 메인 이미지 업로드
+      if (package.mainImage != null) {
+        final mainImageRef = _storage.ref().child(
+            'package_images/${DateTime.now().millisecondsSinceEpoch}_main.jpg');
+        await mainImageRef.putFile(File(package.mainImage!));
+        mainImageUrl = await mainImageRef.getDownloadURL();
+      }
 
-      _isLoading = false;
+      // 설명 이미지들 업로드
+      for (String imagePath in package.descriptionImages) {
+        final imageRef = _storage.ref().child(
+            'package_images/${DateTime.now().millisecondsSinceEpoch}_${descriptionImageUrls.length}.jpg');
+        await imageRef.putFile(File(imagePath));
+        final url = await imageRef.getDownloadURL();
+        descriptionImageUrls.add(url);
+      }
+
+      // 2. Firestore에 저장
+      final docRef = _firestore.collection('packages').doc();
+      await docRef.set({
+        'id': docRef.id,
+        'title': package.title,
+        'titleEn': package.titleEn,
+        'titleJa': package.titleJa,
+        'titleZh': package.titleZh,
+        'description': package.description,
+        'descriptionEn': package.descriptionEn,
+        'descriptionJa': package.descriptionJa,
+        'descriptionZh': package.descriptionZh,
+        'region': package.region,
+        'price': package.price,
+        'mainImage': mainImageUrl, // 업로드된 URL 사용
+        'descriptionImages': descriptionImageUrls, // 업로드된 URL 리스트 사용
+        'guideName': package.guideName,
+        'guideId': package.guideId,
+        'minParticipants': package.minParticipants,
+        'maxParticipants': package.maxParticipants,
+        'nights': package.nights,
+        'totalDays': package.totalDays,
+        'departureDays': package.departureDays,
+        'likedBy': package.likedBy,
+        'likesCount': package.likesCount,
+        'averageRating': package.averageRating,
+        'reviewCount': package.reviewCount,
+        'routePoints':
+            package.routePoints.map((point) => point.toJson()).toList(),
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      final newPackage = package.copyWith(
+        id: docRef.id,
+        mainImage: mainImageUrl,
+        descriptionImages: descriptionImageUrls,
+      );
+      _packages.add(newPackage);
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
-      _isLoading = false;
-      notifyListeners();
       print('Error adding package: $e');
       rethrow;
     }
@@ -390,5 +442,46 @@ class TravelProvider extends ChangeNotifier {
           package.region.toLowerCase().contains(lowerQuery) ||
           package.guideName.toLowerCase().contains(lowerQuery);
     }).toList();
+  }
+
+  Future<Map<String, dynamic>> getGuideReviewStats(String guideId) async {
+    try {
+      final packagesSnapshot = await _firestore
+          .collection('packages')
+          .where('guideId', isEqualTo: guideId)
+          .get();
+
+      if (packagesSnapshot.docs.isEmpty) {
+        return {'totalReviews': 0, 'averageRating': 0.0};
+      }
+
+      int totalReviews = 0;
+      double totalRatingSum = 0.0;
+
+      for (var packageDoc in packagesSnapshot.docs) {
+        final packageId = packageDoc.id;
+        final reviewsSnapshot = await _firestore
+            .collection('reviews')
+            .where('packageId', isEqualTo: packageId)
+            .get();
+
+        totalReviews += reviewsSnapshot.docs.length;
+
+        for (var reviewDoc in reviewsSnapshot.docs) {
+          totalRatingSum += (reviewDoc['rating'] as num).toDouble();
+        }
+      }
+
+      double averageRating =
+          totalReviews > 0 ? (totalRatingSum / totalReviews) : 0.0;
+
+      return {
+        'totalReviews': totalReviews,
+        'averageRating': averageRating,
+      };
+    } catch (e) {
+      print('Error getting guide review stats: $e');
+      return {'totalReviews': 0, 'averageRating': 0.0};
+    }
   }
 }
