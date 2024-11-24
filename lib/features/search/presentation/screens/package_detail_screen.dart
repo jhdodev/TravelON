@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:travel_on_final/core/providers/theme_provider.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:travel_on_final/features/map/domain/entities/travel_point.dart';
 import 'package:travel_on_final/features/map/presentation/screens/naver_route_map_screen.dart';
@@ -20,8 +22,7 @@ class PackageDetailScreen extends StatefulWidget {
   final TravelPackage package;
 
   const PackageDetailScreen(
-      {Key? key, required this.package, required int totalDays})
-      : super(key: key);
+      {super.key, required this.package, required int totalDays});
 
   @override
   State<PackageDetailScreen> createState() => _PackageDetailScreenState();
@@ -31,7 +32,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
   final NumberFormat _priceFormat = NumberFormat('#,###');
   Future<int>? _todayParticipants;
   bool _isAvailable = true;
-  bool _showReviews = false;
+  final bool _showReviews = false;
   int _minParticipants = 0; // 기본값 설정
   int _maxParticipants = 0; // 기본값 설정
   String? _currentUserId;
@@ -121,7 +122,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
   void dispose() {
     if (_mapController != null) {
       for (var overlay in _pathOverlays.values) {
-        _mapController?.deleteOverlay(overlay as NOverlayInfo);
+        _mapController?.deleteOverlay(overlay);
       }
       _mapController?.dispose();
     }
@@ -178,558 +179,625 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('패키지 상세'),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 메인 이미지
-            if (widget.package.mainImage != null &&
-                widget.package.mainImage!.isNotEmpty)
-              Image.network(
-                widget.package.mainImage!,
-                height: 200.h,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Container(
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    return Container(
+      color: isDarkMode ? const Color(0xFF1A1A1A) : Colors.white,
+      child: SafeArea(
+        top: false,
+        bottom: true,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('package_detail.title'.tr()),
+            surfaceTintColor: Colors.transparent,
+          ),
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 메인 이미지
+                if (widget.package.mainImage != null &&
+                    widget.package.mainImage!.isNotEmpty)
+                  Image.network(
+                    widget.package.mainImage!,
                     height: 200.h,
                     width: double.infinity,
-                    color: Colors.grey[200],
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                            : null,
-                      ),
-                    ),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    height: 200.h,
-                    width: double.infinity,
-                    color: Colors.grey[200],
-                    child: const Center(
-                      child: Icon(
-                        Icons.error_outline,
-                        size: 40,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  );
-                },
-              )
-            else
-              Container(
-                height: 200.h,
-                width: double.infinity,
-                color: Colors.blue.shade100,
-                child: Center(
-                  child: Icon(
-                    Icons.landscape,
-                    size: 64,
-                    color: Colors.blue.shade900,
-                  ),
-                ),
-              ),
-
-            Padding(
-              padding: EdgeInsets.all(16.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 제목 및 지역
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          widget.package.title,
-                          style: TextStyle(
-                            fontSize: 24.sp,
-                            fontWeight: FontWeight.bold,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        height: 200.h,
+                        width: double.infinity,
+                        color: Colors.grey[200],
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null,
                           ),
                         ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 6.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade100,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          _getRegionText(widget.package.region),
-                          style: TextStyle(
-                            color: Colors.blue.shade900,
-                            fontWeight: FontWeight.bold,
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        height: 200.h,
+                        width: double.infinity,
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: Icon(
+                            Icons.error_outline,
+                            size: 40,
+                            color: Colors.grey,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  _buildReviewSection(), // 여기로 리뷰 섹션 이동
-
-                  SizedBox(height: 16.h),
+                      );
+                    },
+                  )
+                else
                   Container(
-                    padding: EdgeInsets.all(3.w),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            SizedBox(width: 8.w),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.person, color: Colors.black),
-                                  SizedBox(width: 8.w),
-                                  Text(
-                                    '가이드 : ${widget.package.guideName}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  if (_currentUserId != widget.package.guideId)
-                                    IconButton(
-                                      onPressed: () async {
-                                        final authProvider =
-                                            Provider.of<AuthProvider>(context,
-                                                listen: false);
-                                        final userId =
-                                            authProvider.currentUser?.id;
-                                        if (userId != null) {
-                                          final otherUserId =
-                                              widget.package.guideId;
-                                          final chatId = CreateChatId()
-                                              .call(userId, otherUserId);
-                                          context.push('/chat/$chatId');
-                                        }
-                                      },
-                                      icon: Icon(Icons.chat),
-                                    )
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            SizedBox(width: 8.w),
-                            const Icon(Icons.group, color: Colors.black),
-                            Text(
-                              widget.package.minParticipants != null &&
-                                      widget.package.maxParticipants != null
-                                  ? '예약 가능 인원: ${widget.package.minParticipants}명 ~ ${widget.package.maxParticipants}명'
-                                  : '예약 가능 인원: 정보 없음',
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                color: _isAvailable ? Colors.black : Colors.red,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8.h),
-                        Row(
-                          children: [
-                            SizedBox(width: 8.h),
-                            Text(
-                              '1인 ${_priceFormat.format(widget.package.price.toInt())}원',
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                    height: 200.h,
+                    width: double.infinity,
+                    color: Colors.blue.shade100,
+                    child: Center(
+                      child: Icon(
+                        Icons.landscape,
+                        size: 64,
+                        color: Colors.blue.shade900,
+                      ),
                     ),
                   ),
 
-                  if (!_isAvailable)
-                    Container(
-                      margin: EdgeInsets.only(top: 8.w),
-                      padding: EdgeInsets.all(8.w),
-                      decoration: BoxDecoration(
-                        color: Colors.red.shade100,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Row(
+                Padding(
+                  padding: EdgeInsets.all(16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 제목 및 지역
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Icon(Icons.info_outline, color: Colors.red),
-                          SizedBox(width: 8.w),
-                          Text(
-                            '오늘은 예약이 마감되었습니다',
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Text(
+                              widget.package
+                                  .getTitle(context.locale.languageCode),
+                              style: TextStyle(
+                                fontSize: 24.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12.w,
+                              vertical: 6.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade100,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              _getRegionText(widget.package.region),
+                              style: TextStyle(
+                                color: Colors.blue.shade900,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    ),
+                      _buildReviewSection(), // 여기로 리뷰 섹션 이동
 
-                  SizedBox(height: 24.h),
-
-                  // 설명
-                  Text(
-                    '상세 설명',
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    widget.package.description,
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      height: 1.5.h,
-                    ),
-                  ),
-
-                  SizedBox(height: 24.h),
-                  Text(
-                    '여행 코스',
-                    style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  if (widget.package.routePoints.isNotEmpty)
-                    Container(
-                      height: 300.h,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: Stack(
-                        children: [
-                          NaverMap(
-                            options: NaverMapViewOptions(
-                              initialCameraPosition: NCameraPosition(
-                                target:
-                                    widget.package.routePoints.first.location,
-                                zoom: 8,
-                              ),
-                              scrollGesturesEnable: true,
-                              zoomGesturesEnable: true,
-                              rotationGesturesEnable: true,
-                              tiltGesturesEnable: true,
-                              stopGesturesEnable: true,
-                              locationButtonEnable: true,
-                              consumeSymbolTapEvents: false,
-                            ),
-                            onMapReady: (NaverMapController controller) {
-                              setState(() {
-                                _mapController = controller;
-                              });
-
-                              for (var i = 0;
-                                  i < widget.package.routePoints.length;
-                                  i++) {
-                                final point = widget.package.routePoints[i];
-                                final marker = NMarker(
-                                  id: 'marker_${point.id}',
-                                  position: point.location,
-                                );
-
-                                marker.setCaption(
-                                  NOverlayCaption(
-                                    text: '${i + 1}. ${point.name}',
-                                    textSize: 14,
-                                    color: Colors.blue,
-                                    haloColor: Colors.white,
-                                  ),
-                                );
-
-                                controller.addOverlay(marker);
-                              }
-
-                              // 모든 포인트가 보이도록 카메라 위치 조정
-                              if (widget.package.routePoints.isNotEmpty) {
-                                final bounds = _calculateBounds(
-                                    widget.package.routePoints);
-                                controller.updateCamera(
-                                  NCameraUpdate.fitBounds(
-                                    bounds,
-                                    padding: const EdgeInsets.all(50),
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                          // 줌 컨트롤 버튼
-                          Positioned(
-                            top: 16,
-                            right: 16,
-                            child: Column(
+                      SizedBox(height: 16.h),
+                      Container(
+                        padding: EdgeInsets.all(3.w),
+                        decoration: BoxDecoration(
+                          color: isDarkMode
+                              ? Colors.grey.shade900
+                              : Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
                                     borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
                                   ),
-                                  child: Column(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
                                       IconButton(
+                                        icon: Icon(
+                                          Icons.person,
+                                          color: isDarkMode
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
                                         onPressed: () {
-                                          setState(() {
-                                            _currentZoom = (_currentZoom + 1)
-                                                .clamp(1.0, 20.0);
-                                            _mapController?.updateCamera(
-                                              NCameraUpdate.withParams(
-                                                  zoom: _currentZoom),
-                                            );
-                                          });
+                                          context.push(
+                                              '/user-profile/${widget.package.guideId}');
                                         },
-                                        icon: const Icon(Icons.add),
-                                        padding: const EdgeInsets.all(8),
-                                        constraints: const BoxConstraints(),
-                                        iconSize: 20,
                                       ),
-                                      Container(
-                                        height: 1,
-                                        color: Colors.grey[300],
-                                      ),
-                                      IconButton(
+                                      TextButton(
+                                        style: TextButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 0),
+                                        ),
                                         onPressed: () {
-                                          setState(() {
-                                            _currentZoom = (_currentZoom - 1)
-                                                .clamp(1.0, 20.0);
-                                            _mapController?.updateCamera(
-                                              NCameraUpdate.withParams(
-                                                  zoom: _currentZoom),
-                                            );
-                                          });
+                                          context.push(
+                                              '/user-profile/${widget.package.guideId}');
                                         },
-                                        icon: const Icon(Icons.remove),
-                                        padding: const EdgeInsets.all(8),
-                                        constraints: const BoxConstraints(),
-                                        iconSize: 20,
+                                        child: Text(
+                                          'package_detail.guide'.tr(namedArgs: {
+                                            'name': widget.package.guideName
+                                          }),
+                                          style: TextStyle(
+                                            color: isDarkMode
+                                                ? Colors.white
+                                                : Colors.black,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
                                       ),
+                                      if (_currentUserId !=
+                                          widget.package.guideId)
+                                        IconButton(
+                                          onPressed: () async {
+                                            final authProvider =
+                                                Provider.of<AuthProvider>(
+                                                    context,
+                                                    listen: false);
+                                            final userId =
+                                                authProvider.currentUser?.id;
+                                            if (userId != null) {
+                                              final otherUserId =
+                                                  widget.package.guideId;
+                                              final chatId = CreateChatId()
+                                                  .call(userId, otherUserId);
+                                              context.push('/chat/$chatId');
+                                            }
+                                          },
+                                          icon: Icon(
+                                            Icons.chat,
+                                            color: isDarkMode
+                                                ? Colors.grey[300]
+                                                : Colors.black,
+                                          ),
+                                        )
                                     ],
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                          // 상세 경로 보기 버튼
-                          Positioned(
-                            bottom: 16,
-                            left: 120,
-                            right: 120,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => NaverRouteMapScreen(
-                                      points: widget.package.routePoints,
-                                      totalDays: widget.package.totalDays,
-                                    ),
+                            Row(
+                              children: [
+                                SizedBox(width: 10.w),
+                                Icon(
+                                  Icons.group,
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black,
+                                ),
+                                SizedBox(width: 14.w),
+                                Text(
+                                  widget.package.maxParticipants != null
+                                      ? 'package_detail.participants'
+                                          .tr(namedArgs: {
+                                          'min': widget.package.minParticipants
+                                              .toString(),
+                                          'max': widget.package.maxParticipants
+                                              .toString(),
+                                        })
+                                      : 'package_detail.participants_unknown'
+                                          .tr(),
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                );
-                              },
-                              child: Text('상세 경로 보기'),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                    )
-                  else
-                    Container(
-                      height: 100.h,
-                      alignment: Alignment.center,
-                      child: Text(
-                        '등록된 여행 코스가 없습니다',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 16.sp,
+                            SizedBox(height: 8.h),
+                            Row(
+                              children: [
+                                SizedBox(width: 48.h),
+                                Text(
+                                  'package_detail.price'.tr(namedArgs: {
+                                    'price': _priceFormat
+                                        .format(widget.package.price.toInt())
+                                  }),
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 12.h),
+                          ],
                         ),
                       ),
-                    ),
 
-                  // 여행 코스 목록 표시
-                  if (widget.package.routePoints.isNotEmpty) ...[
-                    SizedBox(height: 16.h),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: widget.package.routePoints.length,
-                      itemBuilder: (context, index) {
-                        final point = widget.package.routePoints[index];
-                        return Card(
-                          margin: EdgeInsets.symmetric(
-                            horizontal: 16.w,
-                            vertical: 4.h,
+                      if (!_isAvailable)
+                        Container(
+                          margin: EdgeInsets.only(top: 8.w),
+                          padding: EdgeInsets.all(8.w),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade100,
+                            borderRadius: BorderRadius.circular(4),
                           ),
-                          child: ListTile(
-                            leading: Container(
-                              width: 40.w,
-                              height: 40.w,
-                              decoration: BoxDecoration(
-                                color: Colors.blue[50],
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  point.type == PointType.hotel ? Icons.hotel :
-                                  point.type == PointType.restaurant ? Icons.restaurant :
-                                  Icons.photo_camera,
-                                  color: Colors.blue,
+                          child: Row(
+                            children: [
+                              const Icon(Icons.info_outline, color: Colors.red),
+                              SizedBox(width: 8.w),
+                              Text(
+                                'package_detail.booking_closed'.tr(),
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            ),
-                            title: Text(
-                              '${index + 1}. ${point.name}',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16.sp,
-                              ),
-                            ),
-                            subtitle: Text(
-                              point.address,
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                color: Colors.grey[600],
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            trailing: Icon(
-                              Icons.arrow_forward_ios,
-                              size: 16.sp,
-                              color: Colors.grey,
-                            ),
-                            onTap: () => _showLocationInfo(point),
+                            ],
                           ),
-                        );
-                      },
-                    ),
-                  ],
+                        ),
 
-                  SizedBox(height: 24.h),
-                  // 설명 이미지들
-                  if (widget.package.descriptionImages.isNotEmpty) ...[
-                    SizedBox(height: 24.h),
-                    Text(
-                      '상세 이미지',
-                      style: TextStyle(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
+                      SizedBox(height: 24.h),
+
+                      // 설명
+                      Text(
+                        'package_detail.description'.tr(),
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 8.h),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: widget.package.descriptionImages.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: EdgeInsets.only(bottom: 16.h),
-                          child: ClipRRect(
+                      SizedBox(height: 8.h),
+                      Text(
+                        widget.package
+                            .getDescription(context.locale.languageCode),
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          height: 1.5.h,
+                        ),
+                      ),
+
+                      SizedBox(height: 24.h),
+                      Text(
+                        'package_detail.course'.tr(),
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      if (widget.package.routePoints.isNotEmpty)
+                        Container(
+                          height: 300.h,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade300),
                             borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              widget.package.descriptionImages[index],
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              loadingBuilder:
-                                  (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Container(
-                                  height: 200.h,
-                                  width: double.infinity,
-                                  color: Colors.grey[200],
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: Stack(
+                            children: [
+                              NaverMap(
+                                options: NaverMapViewOptions(
+                                  initialCameraPosition: NCameraPosition(
+                                    target: widget
+                                        .package.routePoints.first.location,
+                                    zoom: 8,
+                                  ),
+                                  scrollGesturesEnable: true,
+                                  zoomGesturesEnable: true,
+                                  rotationGesturesEnable: true,
+                                  tiltGesturesEnable: true,
+                                  stopGesturesEnable: true,
+                                  locationButtonEnable: true,
+                                  consumeSymbolTapEvents: false,
+                                ),
+                                onMapReady: (NaverMapController controller) {
+                                  setState(() {
+                                    _mapController = controller;
+                                  });
+
+                                  for (var i = 0;
+                                      i < widget.package.routePoints.length;
+                                      i++) {
+                                    final point = widget.package.routePoints[i];
+                                    final marker = NMarker(
+                                      id: 'marker_${point.id}',
+                                      position: point.location,
+                                    );
+
+                                    marker.setCaption(
+                                      NOverlayCaption(
+                                        text: '${i + 1}. ${point.name}',
+                                        textSize: 14,
+                                        color: Colors.blue,
+                                        haloColor: Colors.white,
+                                      ),
+                                    );
+
+                                    controller.addOverlay(marker);
+                                  }
+
+                                  // 모든 포인트가 보이도록 카메라 위치 조정
+                                  if (widget.package.routePoints.isNotEmpty) {
+                                    final bounds = _calculateBounds(
+                                        widget.package.routePoints);
+                                    controller.updateCamera(
+                                      NCameraUpdate.fitBounds(
+                                        bounds,
+                                        padding: const EdgeInsets.all(50),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                              // 줌 컨트롤 버튼
+                              Positioned(
+                                top: 16,
+                                right: 16,
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(8),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color:
+                                                Colors.black.withOpacity(0.1),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                _currentZoom =
+                                                    (_currentZoom + 1)
+                                                        .clamp(1.0, 20.0);
+                                                _mapController?.updateCamera(
+                                                  NCameraUpdate.withParams(
+                                                      zoom: _currentZoom),
+                                                );
+                                              });
+                                            },
+                                            icon: const Icon(
+                                              Icons.add,
+                                              color: Colors.black,
+                                            ),
+                                            padding: const EdgeInsets.all(8),
+                                            constraints: const BoxConstraints(),
+                                            iconSize: 20,
+                                          ),
+                                          Container(
+                                            height: 1,
+                                            color: Colors.grey[300],
+                                          ),
+                                          IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                _currentZoom =
+                                                    (_currentZoom - 1)
+                                                        .clamp(1.0, 20.0);
+                                                _mapController?.updateCamera(
+                                                  NCameraUpdate.withParams(
+                                                      zoom: _currentZoom),
+                                                );
+                                              });
+                                            },
+                                            icon: const Icon(
+                                              Icons.remove,
+                                              color: Colors.black,
+                                            ),
+                                            padding: const EdgeInsets.all(8),
+                                            constraints: const BoxConstraints(),
+                                            iconSize: 20,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // 상세 경로 보기 버튼
+                              Positioned(
+                                bottom: 16,
+                                left: 120,
+                                right: 120,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            NaverRouteMapScreen(
+                                          points: widget.package.routePoints,
+                                          totalDays: widget.package.totalDays,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Text('package_detail.view_route'.tr()),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        Container(
+                          height: 100.h,
+                          alignment: Alignment.center,
+                          child: Text(
+                            'package_detail.no_course'.tr(),
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 16.sp,
+                            ),
+                          ),
+                        ),
+
+                      // 여행 코스 목록 표시
+                      if (widget.package.routePoints.isNotEmpty) ...[
+                        SizedBox(height: 16.h),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: widget.package.routePoints.length,
+                          itemBuilder: (context, index) {
+                            final point = widget.package.routePoints[index];
+                            return Card(
+                              margin: EdgeInsets.symmetric(
+                                horizontal: 16.w,
+                                vertical: 4.h,
+                              ),
+                              child: ListTile(
+                                leading: Container(
+                                  width: 40.w,
+                                  height: 40.w,
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue[50],
+                                    shape: BoxShape.circle,
+                                  ),
                                   child: Center(
-                                    child: CircularProgressIndicator(
-                                      value:
-                                          loadingProgress.expectedTotalBytes !=
+                                    child: Icon(
+                                      point.type == PointType.hotel
+                                          ? Icons.hotel
+                                          : point.type == PointType.restaurant
+                                              ? Icons.restaurant
+                                              : Icons.photo_camera,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ),
+                                title: Text(
+                                  '${index + 1}. ${point.name}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16.sp,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  point.address,
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: Colors.grey[600],
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                trailing: Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 16.sp,
+                                  color: Colors.grey,
+                                ),
+                                onTap: () => _showLocationInfo(point),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+
+                      SizedBox(height: 24.h),
+                      // 설명 이미지들
+                      if (widget.package.descriptionImages.isNotEmpty) ...[
+                        SizedBox(height: 24.h),
+                        Text(
+                          'package_detail.images'.tr(),
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 8.h),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: widget.package.descriptionImages.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: 16.h),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  widget.package.descriptionImages[index],
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Container(
+                                      height: 200.h,
+                                      width: double.infinity,
+                                      color: Colors.grey[200],
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          value: loadingProgress
+                                                      .expectedTotalBytes !=
                                                   null
                                               ? loadingProgress
                                                       .cumulativeBytesLoaded /
                                                   loadingProgress
                                                       .expectedTotalBytes!
                                               : null,
-                                    ),
-                                  ),
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  height: 200.h,
-                                  width: double.infinity,
-                                  color: Colors.grey[200],
-                                  child: const Center(
-                                    child: Icon(
-                                      Icons.error_outline,
-                                      size: 40,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      height: 200.h,
+                                      width: double.infinity,
+                                      color: Colors.grey[200],
+                                      child: const Center(
+                                        child: Icon(
+                                          Icons.error_outline,
+                                          size: 40,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          bottomNavigationBar: Container(
+            padding: const EdgeInsets.all(16),
+            child: ElevatedButton(
+              onPressed: _isAvailable
+                  ? () => context.push('/reservation/${widget.package.id}',
+                      extra: widget.package)
+                  : null,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: Text(
+                _isAvailable
+                    ? 'package_detail.booking.book_now'.tr()
+                    : 'package_detail.booking.closed'.tr(),
               ),
             ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade300,
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: ElevatedButton(
-          onPressed: _isAvailable
-              ? () => context.push('/reservation/${widget.package.id}', extra: widget.package)
-              : null,
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-          ),
-          child: Text(
-            _isAvailable ? '예약하기' : '오늘은 예약 마감',
-            style: const TextStyle(fontSize: 16),
           ),
         ),
       ),
@@ -737,47 +805,23 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
   }
 
   String _getRegionText(String region) {
-    switch (region) {
-      case 'seoul':
-        return '서울';
-      case 'incheon_gyeonggi':
-        return '인천/경기';
-      case 'gangwon':
-        return '강원';
-      case 'daejeon_chungnam':
-        return '대전/충남';
-      case 'chungbuk':
-        return '충북';
-      case 'gwangju_jeonnam':
-        return '광주/전남';
-      case 'jeonbuk':
-        return '전북';
-      case 'busan_gyeongnam':
-        return '부산/경남';
-      case 'daegu_gyeongbuk':
-        return '대구/경북';
-      case 'jeju':
-        return '제주도';
-      default:
-        return '전체';
-    }
+    return 'regions.$region'.tr();
   }
 
   Widget _buildReviewSection() {
     return Consumer<ReviewProvider>(
       builder: (context, reviewProvider, _) {
         final totalReviewCount = reviewProvider.totalReviewCount;
-        final totalAverageRating =
-            reviewProvider.totalAverageRating; // 전체 평균 별점 사용
+        final totalAverageRating = reviewProvider.totalAverageRating;
+        final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
 
         return TextButton(
           onPressed: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => NaverRouteMapScreen(
-                  points: widget.package.routePoints,
-                  totalDays: widget.package.totalDays,
+                builder: (_) => ReviewDetailScreen(
+                  package: widget.package, // TravelPackage 전체를 전달
                 ),
               ),
             );
@@ -786,11 +830,12 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                '리뷰($totalReviewCount)',
+                'review.count'
+                    .tr(namedArgs: {'count': totalReviewCount.toString()}),
                 style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black,
                   fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
                 ),
               ),
               SizedBox(width: 8.w),
@@ -801,14 +846,14 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
               ),
               SizedBox(width: 4.w),
               Text(
-                totalAverageRating.toStringAsFixed(1), // 전체 평균 별점 표시
+                totalAverageRating.toStringAsFixed(1),
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: isDarkMode ? Colors.white : Colors.black,
                 ),
               ),
-              Icon(Icons.chevron_right),
+              const Icon(Icons.chevron_right),
             ],
           ),
         );
@@ -892,13 +937,13 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                 id: 'detail_marker',
                                 position: point.location,
                               )..setCaption(
-                                NOverlayCaption(
-                                  text: point.name,
-                                  textSize: 14,
-                                  color: Colors.blue,
-                                  haloColor: Colors.white,
+                                  NOverlayCaption(
+                                    text: point.name,
+                                    textSize: 14,
+                                    color: Colors.blue,
+                                    haloColor: Colors.white,
+                                  ),
                                 ),
-                              ),
                             );
                           },
                         ),
@@ -915,9 +960,11 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                           Row(
                             children: [
                               Icon(
-                                point.type == PointType.hotel ? Icons.hotel :
-                                point.type == PointType.restaurant ? Icons.restaurant :
-                                Icons.photo_camera,
+                                point.type == PointType.hotel
+                                    ? Icons.hotel
+                                    : point.type == PointType.restaurant
+                                        ? Icons.restaurant
+                                        : Icons.photo_camera,
                                 color: Colors.blue,
                                 size: 28.sp,
                               ),
@@ -944,7 +991,8 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                             ),
                             child: Row(
                               children: [
-                                Icon(Icons.location_on,
+                                Icon(
+                                  Icons.location_on,
                                   color: Colors.blue,
                                   size: 20.sp,
                                 ),
@@ -974,7 +1022,7 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '상세 정보',
+                                    'package_detail.location_info.details'.tr(),
                                     style: TextStyle(
                                       fontSize: 16.sp,
                                       fontWeight: FontWeight.bold,
@@ -1001,7 +1049,8 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
                           ElevatedButton.icon(
                             onPressed: () => _openInNaverMap(point),
                             icon: const Icon(Icons.map),
-                            label: const Text('지도에서 보기'),
+                            label: Text(
+                                'package_detail.location_info.view_map'.tr()),
                             style: ElevatedButton.styleFrom(
                               minimumSize: Size(double.infinity, 48.h),
                               backgroundColor: Colors.green,
@@ -1022,7 +1071,8 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
   }
 
   Future<void> _openInNaverMap(TravelPoint point) async {
-    final webUrl = 'https://map.naver.com/v5/search/${Uri.encodeComponent(point.name)}?c=${point.location.longitude},${point.location.latitude},15,0,0,0,dh';
+    final webUrl =
+        'https://map.naver.com/v5/search/${Uri.encodeComponent(point.name)}?c=${point.location.longitude},${point.location.latitude},15,0,0,0,dh';
 
     try {
       // 웹 URL을 바로 시도
@@ -1032,7 +1082,9 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
       )) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('지도를 열 수 없습니다.')),
+            SnackBar(
+              content: Text('package_detail.location_info.map_error'.tr()),
+            ),
           );
         }
       }
@@ -1040,7 +1092,9 @@ class _PackageDetailScreenState extends State<PackageDetailScreen> {
       print('Error launching URL: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('지도를 열 수 없습니다.')),
+          SnackBar(
+            content: Text('package_detail.location_info.map_error'.tr()),
+          ),
         );
       }
     }

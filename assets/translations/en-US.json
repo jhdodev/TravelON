@@ -1,0 +1,513 @@
+{
+  "app": {
+    "name": "TravelOn"
+  },
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "save_info": "Save Login Info",
+    "signup": "Sign Up",
+    "reset_password": "Reset Password",
+    "login_button": "Login",
+    "or": "OR",
+    "sns_login": "Login with SNS",
+    "welcome": "Welcome, {name}!",
+    "login_failed": "Login failed. Please try again.",
+    "google_failed": "Google login failed.",
+    "github_failed": "GitHub login failed.",
+    "kakao_failed": "Kakao login failed."
+  },
+  "home": {
+    "next_trip": {
+      "greeting": "Hi, {name}",
+      "countdown": "D-{days} until {title}!",
+      "today": "Enjoy your {title}!",
+      "no_trips": "No upcoming trips"
+    },
+    "weather": {
+      "current": "Current Weather",
+      "temperature": "{temp}°",
+      "wind_speed": "{speed}m/s",
+      "conditions": {
+        "rain": "Rain",
+        "rain_snow": "Rain/Snow",
+        "snow": "Snow",
+        "shower": "Shower",
+        "clear": "Clear",
+        "cloudy": "Cloudy",
+        "overcast": "Overcast"
+      }
+    },
+    "popular_courses": "Popular Travel Courses",
+    "view_more": "View More"
+  },
+  "menu": {
+    "travel_recommendation": "Travel Recommendation",
+    "guide_ranking": "Guide Ranking",
+    "local_tour": "Local Tour",
+    "recommended_places": "Recommended Places",
+    "travel_gallery": "Travel Gallery",
+    "Congestion of popular tourist attractions": "Tourist Attraction Congestion"
+  },
+  "regional": {
+    "select_region": "Please select a region",
+    "no_spots": "No recommended places in the selected region"
+  },
+  "region_selector": {
+    "city": "Select City/Province",
+    "district": "Select District",
+    "all": "All"
+  },
+  "navigation": {
+    "home": "Home",
+    "packages": "Packages",
+    "chat": "Chat",
+    "mypage": "My Page"
+  },
+  "weather_regions": {
+    "seoul": "Seoul",
+    "busan": "Busan",
+    "daegu": "Daegu",
+    "incheon": "Incheon",
+    "gwangju": "Gwangju",
+    "deajeon": "Deajeon",
+    "ulsan": "Ulsan",
+    "gyeonggi": "Gyeonggi",
+    "gangwon": "Gangwon",
+    "jeju": "Jeju Island"
+  },
+  "regions": {
+    "seoul": "Seoul",
+    "incheon_gyeonggi": "Incheon/Gyeonggi",
+    "gangwon": "Gangwon",
+    "daejeon_chungnam": "Daejeon/Chungnam",
+    "chungbuk": "Chungbuk",
+    "gwangju_jeonnam": "Gwangju/Jeonnam",
+    "jeonbuk": "Jeonbuk",
+    "busan_gyeongnam": "Busan/Gyeongnam",
+    "daegu_gyeongbuk": "Daegu/Gyeongbuk",
+    "Ulsan": "Ulsan",
+    "jeju": "Jeju Island",
+    "all": "All"
+  },
+  "common": {
+    "guest": "Guest",
+    "see_more": "See More",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "success": "Success",
+    "failed": "Failed",
+    "notice": "Notice",
+    "Read_it_all": "Read_it_all"
+,
+    "error": {
+      "no_data": "No data found",
+      "load_failed": "Failed to load data"
+    }
+  },
+  "search": {
+    "title": "Travel Packages",
+    "hint": "Search by package title or description...",
+    "result_count": "Search Results: {count}",
+    "selected_region": "Selected Region: {region}",
+    "region": "Region: {region}"
+  },
+  "sort": {
+    "latest": "Latest",
+    "price_high": "Highest Price",
+    "price_low": "Lowest Price",
+    "popular": "Popular",
+    "high_rating": "Highest Rating",
+    "most_reviews": "Most Reviews"
+  },
+  "package_detail": {
+    "title": "Package Details",
+    "guide": "Guide: {name}",
+    "participants": "Available Spots: {min} ~ {max} people",
+    "participants_unknown": "Available Spots: No information",
+    "price": "₩ {price} per person",
+    "booking_closed": "Booking is closed for today",
+    "description": "Description",
+    "course": "Travel Course",
+    "no_course": "No travel course registered",
+    "view_route": "View Detailed Route",
+    "images": "Detailed Images",
+    "location_info": {
+      "details": "Details",
+      "view_map": "View on Map",
+      "map_error": "Cannot open map"
+    },
+    "booking": {
+      "book_now": "Book Now",
+      "closed": "Booking Closed Today"
+    }
+  },
+  "profile": {
+    "title": "My Page",
+    "default_user": "User",
+    "guide": {
+      "section_title": "Guide Features",
+      "create_package": "Create Package",
+      "create_package_desc": "Register a new travel package",
+      "manage_reservations": "Manage Reservations",
+      "manage_reservations_desc": "Manage reservations for your packages",
+      "manage_packages": "Manage Packages",
+      "manage_packages_desc": "Edit or delete your registered packages",
+      "certification": "Guide Certification",
+      "certification_desc": "Get certified as a guide"
+    },
+    "auth": {
+      "login_required": "Login required"
+    },
+    "user": {
+      "reservations_title": "Reservation Management",
+      "my_reservations": "My Reservations",
+      "my_reservations_desc": "Check your reserved packages",
+      "liked_packages": "Favorite Packages",
+      "liked_packages_desc": "Check packages you're interested in",
+      "no_liked_packages": "No favorite packages"
+    },
+    "logout": "Logout",
+    "logout_failed": "Logout failed: {error}"
+  },
+  "package_form": {
+    "title": "Register New Package",
+    "main_image": {
+      "add": "Add Main Image"
+    },
+    "package_title": {
+      "label": "Package Title",
+      "hint": "ex: Seoul City Tour",
+      "error": "Please enter a title"
+    },
+    "region": {
+      "label": "Region"
+    },
+    "price": {
+      "label": "Price",
+      "hint": "ex: 50000",
+      "error": {
+        "empty": "Please enter a price",
+        "invalid": "Please enter a valid number"
+      }
+    },
+    "nights": {
+      "label": "Nights",
+      "format": "{nights}N{days}D"
+    },
+    "departure_days": {
+      "label": "Departure Days",
+      "error": "Please select departure days",
+      "days": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      }
+    },
+    "participants": {
+      "min": {
+        "label": "Minimum Participants",
+        "hint": "ex: 2",
+        "error": {
+          "empty": "Please enter minimum participants",
+          "invalid": "Please enter a valid number",
+          "greater_than_max": "Minimum cannot be greater than maximum"
+        }
+      },
+      "max": {
+        "label": "Maximum Participants",
+        "hint": "ex: 10",
+        "error": {
+          "empty": "Please enter maximum participants",
+          "invalid": "Please enter a valid number"
+        }
+      }
+    },
+    "description": {
+      "label": "Package Description",
+      "hint": "Enter detailed description of the package",
+      "error": "Please enter a description",
+      "images": {
+        "label": "Description Images",
+        "add": "Add"
+      }
+    },
+    "route": {
+      "label": "Travel Route"
+    },
+    "submit": "Register Package",
+    "places": {
+      "hotel": "Hotel",
+      "restaurant": "Restaurant",
+      "attraction": "Attraction"
+    },
+    "route_editor": {
+      "day": "{day} Day"
+    },
+    "travel_route": {
+      "title": "Travel Route"
+    }
+  },
+  "reservations": {
+    "my_reservations": "My Reservations",
+    "pending_reservations": "Pending Reservations",
+    "confirmed_reservations": "Confirmed Reservations",
+    "no_reservations": "No reservations found.",
+    "no_pending_reservations": "No pending reservations.",
+    "no_confirmed_reservations": "No confirmed reservations.",
+    "guide": "Guide: {name}",
+    "reservation_date": "Reservation Date: {date}",
+    "request_date": "Request Date: {date}",
+    "price": "Price: ￦{amount}",
+    "pending_approval": "Pending Approval",
+    "confirmed": "Confirmed",
+    "package_not_found": "Package not found.",
+    "package_load_error": "Error loading package: {0}",
+    "error": {
+      "invalid_participants": "Invalid number of participants",
+      "date_full": "This date is already fully booked",
+      "not_found": "Reservation not found"
+    },
+    "notification": {
+      "title": {
+        "reservation_change": "Reservation Status Changed",
+        "new_request": "New Reservation Request"
+      },
+      "message": {
+        "reservation_change": "Your reservation for {package} has been {status}",
+        "new_request": "{name} has requested to book {package} ({count} people)"
+      }
+    },
+    "status": {
+      "approved": "approved",
+      "rejected": "rejected",
+      "pending": "pending"
+    }
+  },
+  "guide_ranking": {
+    "title": "Guide Ranking",
+    "stats": "Total {0} reservations / {1} packages",
+    "rank": "Rank {0}",
+    "error": "Error: {0}"
+  },
+  "review": {
+    "count": "{count} Reviews",
+    "write": "Write Review",
+    "edit": "Edit Review",
+    "package_title": "Package Name",
+    "rating": "Rating",
+    "content": {
+      "label": "Review Content",
+      "hint": "Share your experience about the package tour",
+      "empty_error": "Please enter review content"
+    },
+    "submit": "Submit Review",
+    "update": "Complete Update",
+    "success": {
+      "add": "Review has been submitted",
+      "edit": "Review has been updated"
+    },
+    "stats": {
+      "count": "{count} Reviews",
+      "empty": "No reviews yet"
+    },
+    "action": {
+      "write": "Write a Review",
+      "cannot_write": "Cannot Write Review",
+      "load_more": "See More"
+    },
+    "error": {
+      "unauthorized": "Only users with approved reservations can write reviews",
+      "already_reviewed": "You have already written a review",
+      "check_status": "An error occurred while checking review status",
+      "loading": "Error occurred while loading reviews"
+    }
+  },
+  "density": {
+    "percent": "Congestion {value}%"
+  },
+  "recommendation": {
+    "title": "Travel Recommendations",
+    "empty": "I don't have any travel packages to recommend.\nLikes travel packages and get more recommendations!",
+    "rank": "Rank {rank}"
+  },
+  "tourist_category": {
+    "palace": "Palace",
+    "beach": "Beach",
+    "nature": "Nature",
+    "observatory": "Observatory",
+    "attraction": "Tourist Attraction"
+  },
+  "gallery": {
+    "title": "Travel Gallery",
+    "no_posts": "No posts yet",
+    "post": {
+      "login_required": "Login required",
+      "like_error": "Error occurred while processing like",
+      "scrap_success": "Post has been saved",
+      "scrap_canceled": "Post has been unsaved",
+      "scrap_error": "Error occurred while saving post",
+      "delete_title": "Delete Post",
+      "delete_confirm": "Are you sure you want to delete this post?",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "delete_success": "Post has been deleted",
+      "delete_error": "Delete failed: {error}",
+      "edit": "Edit",
+      "likes_count": "{count} likes",
+      "comments_count": "View all {count} comments",
+      "add_post": {
+        "title": "New Post",
+        "share": "Share",
+        "add_image": "Add Image",
+        "location": {
+          "label": "Location",
+          "hint": "e.g. Seoul Tower",
+          "error": "Please enter location"
+        },
+        "description": {
+          "label": "Description",
+          "hint": "Share your travel experience",
+          "error": "Please enter description"
+        },
+        "package_tag": {
+          "label": "Travel Package Tag",
+          "hint": "Select related package (optional)",
+          "none": "None"
+        },
+        "upload": {
+          "success": "Post has been uploaded",
+          "error": "Upload failed: {error}",
+          "package_not_found": "Selected package not found"
+        }
+      }
+    }
+  },
+  "commends": {
+    "commend": "commend",
+    "Writing comments": "Writing comments..."
+  },
+  "chat": {
+    "title": "Chat List",
+    "login_required": "Login Required",
+    "search": {
+      "label": "Search",
+      "guide": "Search Guide"
+    },
+    "screen": {
+      "loading": "Loading...",
+      "conversation_with": "'s Chat",
+      "input": {
+        "hint": "Type a message..."
+      }
+    },
+    "add_content": {
+      "gallery": "Gallery",
+      "camera": "Camera",
+      "user": "User",
+      "package": "Package",
+      "map": "Map",
+      "image": {
+        "send": "Send Photo",
+        "no": "No",
+        "yes": "Yes"
+      }
+    },
+    "no_chats": "No chat rooms",
+    "no_results": "No matching chat rooms",
+    "error": "An error occurred",
+    "leave": {
+      "confirm_title": "Leave chat with {name}?",
+      "cancel": "Cancel",
+      "confirm": "Leave"
+    }
+  },
+  "user_profile": {
+    "title": {
+      "with_name": "s Profile",
+      "default": "Profile"
+    },
+    "loading": "Loading...",
+    "error": "An error occurred.",
+    "user_not_found": "User information not found.",
+    "guide_badge": "Guide",
+    "default_intro": "Nice to meet you.",
+    "background": {
+      "change_title": "Change Background Image",
+      "change_message": "Would you like to change the background image?",
+      "remove_title": "Remove Background Image",
+      "remove_message": "Would you like to remove the background image?",
+      "remove_error": "Failed to remove the background image. Please try again.",
+      "yes": "Yes",
+      "no": "No",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    },
+    "guide_stats": {
+      "average_rating": "Average rating: {rating}",
+      "review_count": "{count} reviews",
+      "review_error": "Error loading review information.",
+      "no_reviews": "No review data available.",
+      "packages": {
+        "title": "Guide Packages",
+        "view_more": "View More"
+      }
+    },
+    "reviews": {
+      "recent_title": "Recently Written Reviews",
+      "view_more": "View More",
+      "package_prefix": "Package:",
+      "no_reviews": "No reviews written.",
+      "rating": "Rating: {rating} / 5",
+      "created_at": "Created on: {date}"
+    }
+  },
+  "reservation_calendar": {
+    "title": "Select Reservation Date",
+    "participants": {
+      "title": "Select Number of Participants",
+      "range": "{min} ~ {max} people",
+      "count": "{count} people",
+      "min_error": "Please select at least {min} people",
+      "max_error": "You can select up to {max} people",
+      "invalid_error": "Please select a valid number of participants"
+    },
+    "date": {
+      "select_error": "Please select a date",
+      "unavailable_error": "This departure date is not available",
+      "booked_error": "This date is fully booked",
+      "selected": "Selected Date: {date}",
+      "package": "Package: {title}",
+      "duration": "{nights} nights {days} days",
+      "departure_days": "Departure Days:",
+      "weekdays": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      }
+    },
+    "price": "Price: ${price}",
+    "submit": "Request Reservation",
+    "request": {
+      "success": "Reservation request submitted",
+      "error": "Error occurred while requesting reservation: {error}"
+    }
+  }
+}

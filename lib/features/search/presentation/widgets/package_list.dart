@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:travel_on_final/core/providers/theme_provider.dart';
+import 'package:travel_on_final/core/theme/colors.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import '../providers/travel_provider.dart';
 import '../../domain/entities/travel_package.dart';
@@ -148,7 +151,7 @@ class _LikeablePackageCardState extends State<LikeablePackageCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            widget.package.title,
+            widget.package.getTitle(context.locale.languageCode),
             style: TextStyle(
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
@@ -156,7 +159,7 @@ class _LikeablePackageCardState extends State<LikeablePackageCard> {
           ),
           SizedBox(height: 8.h),
           Text(
-            widget.package.description,
+            widget.package.getDescription(context.locale.languageCode),
             style: TextStyle(
               color: Colors.grey,
               fontSize: 14.sp,
@@ -170,7 +173,7 @@ class _LikeablePackageCardState extends State<LikeablePackageCard> {
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.blue,
+              color: AppColors.travelonBlueColor,
             ),
           ),
         ],
@@ -180,16 +183,20 @@ class _LikeablePackageCardState extends State<LikeablePackageCard> {
 
   // 좋아요 버튼 위젯
   Widget _buildLikeButton(String? userId, bool isLiked) {
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
     return Positioned(
       top: 8,
       right: 8,
       child: Container(
         padding: EdgeInsets.all(1.w),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.8),
+          color: isDarkMode
+              ? Colors.grey.shade900.withOpacity(0.9)
+              : Colors.white.withOpacity(0.8),
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Consumer<TravelProvider>(  // StreamBuilder 대신 Consumer 사용
+        child: Consumer<TravelProvider>(
+          // StreamBuilder 대신 Consumer 사용
           builder: (context, provider, _) {
             final package = provider.getPackageById(widget.package.id);
             if (package == null) return _buildLikeButtonPlaceholder();

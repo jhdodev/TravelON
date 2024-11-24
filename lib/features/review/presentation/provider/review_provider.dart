@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/review/domain/entities/review.dart';
 import 'package:travel_on_final/features/review/domain/repositories/review_repository.dart';
-import 'package:travel_on_final/features/search/presentation/providers/travel_provider.dart';
 
 class ReviewProvider extends ChangeNotifier {
   final ReviewRepository _repository;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<Review> _reviews = [];
+  List<Review> _userReviews = [];
   bool _isLoading = false;
   String? _error;
   bool _hasMore = true;
@@ -21,6 +21,7 @@ class ReviewProvider extends ChangeNotifier {
   ReviewProvider(this._repository);
 
   List<Review> get reviews => _reviews;
+  List<Review> get userReviews => _userReviews.isEmpty ? [] : _userReviews;
   bool get isLoading => _isLoading;
   String? get error => _error;
   bool get hasMore => _hasMore;
@@ -128,7 +129,7 @@ class ReviewProvider extends ChangeNotifier {
       // print('Loaded reviews: ${_reviews.length}'); // 디버깅용
       // print('Has more: $_hasMore'); // 디버깅용
     } catch (e) {
-      _error = e.toString();
+      _error = 'review.error.loading'.tr();
       print('Error loading reviews: $e');
     } finally {
       _isLoading = false;
@@ -223,14 +224,7 @@ class ReviewProvider extends ChangeNotifier {
 
   Future<String?> checkReviewStatus(String userId, String packageId) async {
     try {
-      // 예약 확인
-      final hasApprovedReservation =
-          await _repository.canUserReview(userId, packageId);
-      if (!hasApprovedReservation) {
-        return '예약 승인된 사용자만 리뷰를 작성할 수 있습니다.';
-      }
-
-      // 이미 리뷰를 작성했는지 확인
+      // 먼저 리뷰 작성 여부 확인
       final existingReviews = await FirebaseFirestore.instance
           .collection('reviews')
           .where('userId', isEqualTo: userId)
@@ -238,12 +232,20 @@ class ReviewProvider extends ChangeNotifier {
           .get();
 
       if (existingReviews.docs.isNotEmpty) {
-        return '이미 리뷰를 작성하셨습니다.';
+        return 'review.error.already_reviewed'.tr();
       }
 
-      return null; // null이면 리뷰 작성 가능
+      // 다음으로 예약 확인
+      final hasApprovedReservation =
+          await _repository.canUserReview(userId, packageId);
+      if (!hasApprovedReservation) {
+        return 'review.error.unauthorized'.tr(); // throw 대신 return
+      }
+
+      return null;
     } catch (e) {
-      return '리뷰 상태 확인 중 오류가 발생했습니다.';
+      print('Review status check error: $e'); // 에러 로깅 추가
+      return 'review.error.check_status'.tr();
     }
   }
 
@@ -287,6 +289,48 @@ class ReviewProvider extends ChangeNotifier {
       _error = e.toString();
       notifyListeners();
       rethrow;
+    }
+  }
+
+  Future<List<Review>> loadReviewsForUser(String userId) async {
+    try {
+      _userReviews = [];
+      _isLoading = true;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
+
+      final snapshot = await FirebaseFirestore.instance
+          .collection('reviews')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      final reviews = snapshot.docs.map((doc) {
+        final data = doc.data();
+        return Review(
+          id: doc.id,
+          packageId: data['packageId'],
+          userId: data['userId'],
+          userName: data['userName'],
+          rating: (data['rating'] as num).toDouble(),
+          content: data['content'],
+          createdAt: (data['createdAt'] as Timestamp).toDate(),
+          reservationId: data['reservationId'],
+        );
+      }).toList();
+
+      _userReviews = reviews;
+      return reviews;
+    } catch (e) {
+      print('리뷰 불러오기 실패: $e');
+      return [];
+    } finally {
+      _isLoading = false;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
     }
   }
 }
