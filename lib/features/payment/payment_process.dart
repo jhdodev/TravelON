@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 class PaymentProcess extends StatefulWidget {
   final PaymentData paymentData;
 
-  const PaymentProcess({Key? key, required this.paymentData}) : super(key: key);
+  const PaymentProcess({super.key, required this.paymentData});
 
   @override
   State<PaymentProcess> createState() => _PaymentProcessState();
@@ -25,7 +25,8 @@ class _PaymentProcessState extends State<PaymentProcess> {
   }
 
   Future<void> confirmPayment(String paymentKey) async {
-    final url = Uri.parse('http://10.0.2.2:4000/confirm');
+    final url =
+        Uri.parse('https://travelon.onrender.com/confirm'); // Render URL
 
     try {
       final requestData = {
@@ -52,7 +53,8 @@ class _PaymentProcessState extends State<PaymentProcess> {
   }
 
   Future<void> verifyPayment(String paymentKey) async {
-    final url = Uri.parse('http://10.0.2.2:4000/verifyPayment');
+    final url =
+        Uri.parse('https://travelon.onrender.com/verifyPayment'); // Render URL
 
     try {
       final requestData = {
