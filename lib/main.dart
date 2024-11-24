@@ -49,7 +49,6 @@ import 'package:travel_on_final/features/regional/data/repositories/regional_rep
 import 'package:travel_on_final/route.dart';
 
 import 'package:kakao_flutter_sdk_common/kakao_flutter_sdk_common.dart';
-import 'package:get/get.dart'; // Get 패키지 추가
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
