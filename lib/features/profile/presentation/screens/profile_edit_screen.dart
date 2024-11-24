@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:travel_on_final/features/auth/presentation/providers/auth_provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,6 +18,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   DateTime? _birthDate;
   String? _profileImageUrl;
   File? _selectedImageFile;
+  bool _isNameValid = true;
 
   @override
   void initState() {
@@ -61,10 +63,25 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
     }
   }
 
+  void _validateName() {
+    setState(() {
+      _isNameValid = _nameController.text.length >= 2 && _nameController.text.length <= 8;
+    });
+  }
+
   void _saveProfile() async {
+    _validateName();
+
+    if (!_isNameValid) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('이름은 2글자 이상 8글자 이하로 설정해야 합니다.')),
+      );
+      return;
+    }
+
     if (_nameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('이름은 비어 있을 수 없습니다')),
+        SnackBar(content: Text('이름은 비어 있을 수 없습니다.')),
       );
       return;
     }
@@ -80,8 +97,86 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('프로필 업데이트에 실패했습니다')),
+        SnackBar(content: Text('프로필 업데이트에 실패했습니다.')),
       );
+    }
+  }
+
+  Future<void> _deleteAccount() async {
+    final authProvider = context.read<AuthProvider>();
+    final TextEditingController passwordController = TextEditingController();
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("회원 탈퇴"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("회원 탈퇴를 진행하시겠습니까?"),
+              SizedBox(height: 8.0),
+              Text("탈퇴 후 복구는 불가능합니다.",
+                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              SizedBox(height: 16.0),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.blue, width: 1.5),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                padding: EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: '비밀번호를 입력해주세요...',
+                    border: InputBorder.none,
+                  ),
+                ),
+              )
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text("취소"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text("탈퇴", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      final password = passwordController.text.trim();
+      if (password.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('비밀번호를 입력해주세요.')),
+        );
+        return;
+      }
+
+      try {
+        await authProvider.deleteAccount(context, password);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('회원 탈퇴가 완료되었습니다.')),
+        );
+        context.go('/login');
+      } catch (e) {
+        if (e.toString().contains('permission-denied')) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('권한 부족: 관리자에게 문의하세요.')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('회원 탈퇴 실패: ${e.toString()}')),
+          );
+        }
+      }
     }
   }
 
@@ -116,10 +211,12 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               ),
               child: TextField(
                 controller: _nameController,
+                onChanged: (_) => _validateName(),
                 decoration: InputDecoration(
                   labelText: '이름',
                   labelStyle: TextStyle(color: Colors.blue),
                   border: InputBorder.none,
+                  errorText: !_isNameValid ? '이름은 2글자 이상 8글자 이하여야 합니다.' : null,
                 ),
               ),
             ),
@@ -216,7 +313,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                 children: [
                   Text(
                     '생일',
-                    style: TextStyle(color: Colors.blue),
+                    style: TextStyle(color: Colors.blue,),
                   ),
                   Text(
                     _birthDate != null
@@ -232,8 +329,27 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
             ),
             SizedBox(height: 24),
             ElevatedButton(
-              onPressed: _saveProfile,
-              child: Text('저장'),
+              onPressed: _isNameValid ? _saveProfile : null,
+              style: ElevatedButton.styleFrom(
+                side: BorderSide(color: Colors.lightBlue),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+              child: Text(
+                '저장',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold
+                ),
+              ),
+            ),
+            SizedBox(height: 24),
+            TextButton(
+              onPressed: _deleteAccount,
+              child: Text(
+                '회원 탈퇴',
+                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
